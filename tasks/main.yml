@@ -1,0 +1,8 @@
+---
+- name: Allow specified users and groups run sudo commands without a password
+  template:
+    src: passwordless_sudoers.j2
+    dest: /etc/sudoers.d/passwordless-sudoers
+    validate: 'visudo -cf %s'
+    mode: 0440
+    backup: false   # Do NOT leave backups in the sudoers.d directory. Doing so may break sudo or cause unexpected behaviuor.
