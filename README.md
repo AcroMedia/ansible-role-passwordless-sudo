@@ -1,5 +1,7 @@
 # ansible-role-passwordless-sudo
 
+![.github/workflows/molecule.yml](https://github.com/AcroMedia/ansible-role-passwordless-sudo/workflows/.github/workflows/molecule.yml/badge.svg)
+
 Configure the list of users and/or groups that can run sudo commands without a password.
 
 ## Warning

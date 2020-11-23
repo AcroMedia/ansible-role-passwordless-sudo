@@ -1,0 +1,69 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  gather_facts: true
+  vars_files: "vars.{{ ansible_os_family }}.yml"
+  tasks:
+    - name: Create a bb8 user with no special privileges, who cannot sudo
+      user:
+        name: bb8
+    - name: Execute failing sudo test for bb8
+      become: yes
+      become_user: bb8
+      command: >
+        sudo /bin/true
+      ignore_errors: yes
+      register: bb8_test
+      changed_when: false
+    - name: Confirm that bb8 cannot sudo
+      assert:
+        that: bb8_test.rc != 0
+
+    - name: Create a c3po user who can sudo, but not without a password
+      user:
+        name: c3po
+        groups:
+          - "{{ os_sudo_group_name }}"
+        append: yes
+    - name: Execute failing sudo test for c3po
+      become: yes
+      become_user: c3po
+      command: >
+        sudo /bin/true
+      ignore_errors: yes
+      register: c3po_test
+    - name: Confirm that c3po cannot sudo without password
+      assert:
+        that: c3po_test.rc != 0
+
+    - name: Create sudoable group for r2d2 user
+      group:
+        name: automators
+    - name: Execute r2d2 test
+      user:
+        name: r2d2
+        groups: automators
+        append: yes
+    - name: Confirm that r2d2 can sudo without a password
+      become: yes
+      become_user: r2d2
+      command: >
+        sudo /bin/true
+      register: r2d2_test
+    - name: Confirm that r2d2_test can sudo without password
+      assert:
+        that: r2d2_test.rc == 0
+
+    - name: Create user lskywalker who can sudo without a password
+      user:
+        name: lskywalker
+    - name: Execute lskywalker test
+      become: yes
+      become_user: lskywalker
+      command: >
+        sudo /bin/true
+      register: lskywalker_test
+    - name: Confirm that lskywalker can sudo without a password
+      assert:
+        that: lskywalker_test.rc == 0

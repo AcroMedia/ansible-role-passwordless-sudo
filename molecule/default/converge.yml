@@ -1,0 +1,19 @@
+---
+- name: Converge
+  hosts: all
+  become: true
+
+  pre_tasks:
+    - name: Update apt cache.
+      apt: update_cache=true cache_valid_time=600
+      when: ansible_os_family == 'Debian'
+
+  vars:
+    # Add some variables to make the role actually do something. See verify.yml for tests
+    passwordless_sudo_users:
+      - lskywalker
+    passwordless_sudo_groups:
+      - automators
+
+  roles:
+    - role: ansible-role-passwordless-sudo
